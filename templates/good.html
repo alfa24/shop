@@ -7,6 +7,6 @@
     <p>{{ good.description|linebreaksbr }}</p>
     <p>{% if not good.in_stock %} Нет в наличии! {% endif %}</p>
     <p>
-        <a href="/goods/">Назад</a>
+        <a href="{% url "index" cat_id=good.category.id %}?page={{ pn }}">Назад</a>
     </p>
 {%endblock%}

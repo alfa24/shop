@@ -35,10 +35,15 @@ def index(request, cat_id=None):
 
 
 def good(request, good_id):
+    try:
+        page_num = request.GET['page']
+    except KeyError:
+        page_num = 1
+
     cats = Category.objects.all().order_by('name')
     try:
         good = Good.objects.get(pk=good_id)
-    except:
+    except Good.DoesNotExist:
         raise Http404
 
-    return render(request, 'good.html', context={'good': good})
+    return render(request, 'good.html', context={'good': good, 'cats': cats, 'pn': page_num})
