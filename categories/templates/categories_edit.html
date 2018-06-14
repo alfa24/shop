@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Категории{% endblock %}
+{% block main %}
+    <h2>Категории</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        {#      {{ formset.as_p }}#}
+        {{ formset.management_form }}
+        {% for form in formset %}
+            {% for field in form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+                <div class="form-field">
+                    {% if field.errors.count > 0 %}
+                        <div class="error-list">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                    <div class="label">{{ field.label }}</div>
+                    <div class="control">{{ field }}</div>
+                    {% if field.help_text %}
+                        <div class="help">{{ field.help_text }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+{#            {% if formset.can_order %}#}
+{#                <div>Порядок: {{ form.ORDER }}</div>#}
+{#            {% endif %}#}
+{##}
+{#            {% if formset.can_delete %}#}
+{#                <div>{{ form.DELETE }} Удалить</div>#}
+{#            {% endif %}#}
+        {% endfor %}
+
+        <div class="submit-button"><input type="submit" value="Сохранить"></div>
+    </form>
+{% endblock %}

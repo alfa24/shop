@@ -1,6 +1,8 @@
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse
 from django.views.generic import ListView, DetailView
-from django.views.generic.base import ContextMixin
+from django.views.generic.base import ContextMixin, TemplateView
 from django.views.generic.edit import ProcessFormView, CreateView, UpdateView, DeleteView, FormMixin
 
 from goods.forms import GoodForm
@@ -132,15 +134,18 @@ class GoodCreate(CreateView, GoodEditMixin):
     model = Good
     form_class = GoodForm
     template_name = "good_add.html"
+
     # fields = [field.name for field in model._meta.fields]
 
     def get(self, request, *args, **kwargs):
         if self.kwargs['cat_id']:
             self.initial['category'] = Category.objects.get(pk=self.kwargs['cat_id'])
+        self.initial['in_stock'] = request.session.get('in_stock', True)
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.success_url = reverse('index', kwargs={'cat_id': Category.objects.get(pk=self.kwargs['cat_id']).id})
+        request.session['in_stock'] = request.POST.get('in_stock', True)
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -149,12 +154,15 @@ class GoodCreate(CreateView, GoodEditMixin):
         return context
 
 
-class GoodUpdate(UpdateView, GoodEditMixin, GoodEditView):
+class GoodUpdate(SuccessMessageMixin, UpdateView, GoodEditMixin, GoodEditView):
     model = Good
     form_class = GoodForm
     template_name = "good_edit.html"
     pk_url_kwarg = "good_id"
     # fields = [field.name for field in model._meta.fields]
+    # добавляем сообщение в request
+    #  переопределяем из SuccessMessageMixin
+    success_message = "Товар успешно обновлен."
 
     def post(self, request, *args, **kwargs):
         self.success_url = reverse('index', kwargs={'cat_id': Good.objects.get(pk=self.kwargs['good_id']).category.id})
@@ -169,6 +177,8 @@ class GoodDelete(DeleteView, GoodEditMixin, GoodEditView):
 
     def post(self, request, *args, **kwargs):
         self.success_url = reverse('index', kwargs={'cat_id': Good.objects.get(pk=self.kwargs['good_id']).category.id})
+        # добавляем сообщение в request
+        messages.add_message(request, messages.SUCCESS, "Товар успешно удален.")
         return super().post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):

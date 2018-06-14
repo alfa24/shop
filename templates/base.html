@@ -1,34 +1,44 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <link type="text/css" href="{% static 'main.css' %}" rel="stylesheet">
-    <title>{% block title%} {%endblock%} :: Все для уборки</title>
+    <title>{% block title %} {% endblock %} :: Все для уборки</title>
 </head>
 
 <body>
-    <div id='header'>
-        <h1>Все для уборки</h1>
-    </div>
-    <div id="leftmenu">
+<div id='header'>
+    <h1>Все для уборки</h1>
+    {#    выводим список сообщений из request#}
+    {% if messages %}
         <ul>
-            {% for cat in cats %}
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+<div id="leftmenu">
+    <ul>
+        {% for cat in cats %}
             <li>
                 {% url 'index' cat_id=cat.id as cat_url %}
                 <a href="{{ cat_url }}">{{ cat.name }}</a>
             </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div id="main">
-        {%block main%} {%endblock%}
-    </div>
+        {% endfor %}
+    </ul>
+    <hr>
+    <a href="{% url 'categories_edit' %}">Редактировать список</a>
+</div>
+<div id="main">
+    {% block main %} {% endblock %}
+</div>
 
-    <div id='footer'>
-        <p>Все права принадлежат разработчикам сайта</p>
-    </div>
+<div id='footer'>
+    <p>Все права принадлежат разработчикам сайта</p>
+</div>
 </body>
 
 </html>

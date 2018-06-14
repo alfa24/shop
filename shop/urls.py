@@ -20,4 +20,5 @@ import goods
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('goods/', include("goods.urls")),
+    path('categories/', include("categories.urls")),
 ]
